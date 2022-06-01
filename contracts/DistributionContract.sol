@@ -43,6 +43,7 @@ contract DistributionContract {
         amountTokensForBencefiares.push(_amount);
     }
 
+    // this function must update _balanceOfBeneficiares[] , but don't have address in params
     function decreaseReward (uint _beneficiary , uint256 _amount) public onlyOwner {
         require(_amount != 0 && _beneficiary != 0);
         amountTokensForBencefiares[_beneficiary] -= _amount;
@@ -59,6 +60,7 @@ contract DistributionContract {
 
     function claim () public {
         require(lockStatus == true , "claim is locked !");
+        _balanceOfBeneficiares[msg.sender] = 0;
         token.transfer(msg.sender , _balanceOfBeneficiares[msg.sender]);
     }
 
