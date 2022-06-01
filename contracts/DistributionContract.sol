@@ -26,7 +26,8 @@ contract DistributionContract {
     }
 
     function deposit (uint256 _amount) public onlyOwner {
-        token.transferFrom(msg.sender, address(this), _amount);
+        token.approve(address(this),_amount);
+        token.transferFrom(contractOwner,address(this), _amount);
     }
 
     function addBeneficiaries (address [] memory _beneficiaries , uint256 [] memory _amount) public onlyOwner {
