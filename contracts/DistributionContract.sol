@@ -6,22 +6,18 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DistributionContract {
 
+    mapping(address=>uint256)_balanceOfBeneficiares;
 
-    struct beneficiary {
-        address _addressOfBeneficiary;
-        uint256 _reward;
-        bool transferStatus;
-    }
-
-    mapping(address=>uint256)_deposit;
-
-    beneficiary [] beneficiaryList;
+    address [] beneficiaryList;
+    uint [] amountTokensForBencefiares;
 
     address contractOwner;
+    bool public lockStatus ;
     IERC20 private token;
 
     constructor (address _myToken) {
         token = IERC20(_myToken);
+        contractOwner = msg.sender;
     }
 
     modifier onlyOwner () {
@@ -30,44 +26,40 @@ contract DistributionContract {
     }
 
     function deposit (uint256 _amount) public onlyOwner {
-        _deposit[contractOwner] += _amount;
-        token.transferFrom(contractOwner, address(this), _amount);
+        token.transferFrom(msg.sender, address(this), _amount);
     }
 
-    function addBeneficiaries (uint256 _beneficiaries , uint256 _amount) public onlyOwner {
-
-        for(uint256 a = 0 ; a <= _beneficiaries ; a++){
-             beneficiaryList[a]._reward = _amount;
-             beneficiaryList[a].transferStatus = false;
+    function addBeneficiaries (address [] memory _beneficiaries , uint256 [] memory _amount) public onlyOwner {
+        for(uint256 a = 0 ; a <= _beneficiaries.length ; a++){
+             beneficiaryList[a] = _beneficiaries[a];
+             amountTokensForBencefiares[a] = _amount[a];
+             _balanceOfBeneficiares[_beneficiaries[a]] = _amount[a];
         }
     }
 
     function addBeneficiary (address _beneficiary , uint256 _amount) public onlyOwner {
-
-        beneficiaryList.push(beneficiary(_beneficiary,_amount,false));
+        require(_amount != 0 && _beneficiary != address(0));
+        beneficiaryList.push(_beneficiary);
+        amountTokensForBencefiares.push(_amount);
     }
 
     function decreaseReward (uint _beneficiary , uint256 _amount) public onlyOwner {
-        beneficiaryList[_beneficiary]._reward = _amount;
+        require(_amount != 0 && _beneficiary != 0);
+        amountTokensForBencefiares[_beneficiary] -= _amount;
     }
 
     function emergencyWithdraw (uint256 _amount) public onlyOwner {
-        token.transferFrom(address(this),contractOwner, _amount);
+        token.transfer(msg.sender, _amount);
     }
 
-    function lockRewards (uint256 beneficiaryIndex) public onlyOwner {
-        if(beneficiaryList[beneficiaryIndex].transferStatus == false) {
-            beneficiaryList[beneficiaryIndex].transferStatus = true;
-        }
-        else if(beneficiaryList[beneficiaryIndex].transferStatus == true) {
-            beneficiaryList[beneficiaryIndex].transferStatus = false;
-        }
+    function lockRewards (bool lock) public onlyOwner returns (bool status){
+            lockStatus = lock;
+            return lockStatus;
     }
 
     function claim () public {
-        token.transferFrom(address(this),
-        beneficiaryList[msg.sender]._addressOfBeneficiary,
-        beneficiaryList[msg.sender]._reward);
+        require(lockStatus == true , "claim is locked !");
+        token.transfer(msg.sender , _balanceOfBeneficiares[msg.sender]);
     }
 
 
