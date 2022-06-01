@@ -15,5 +15,9 @@
   "bugs": {
     "url": "https://github.com/ZaniInc/FirstTaskZanozin/issues"
   },
-  "homepage": "https://github.com/ZaniInc/FirstTaskZanozin#readme"
+  "homepage": "https://github.com/ZaniInc/FirstTaskZanozin#readme",
+  "dependencies": {
+    "@openzeppelin/contracts": "^4.6.0",
+    "truffle": "^5.1.67"
+  }
 }

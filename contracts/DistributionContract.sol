@@ -7,16 +7,15 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 contract DistributionContract {
 
 
-    struct beneficiaryMain {
+    struct beneficiary {
         address _addressOfBeneficiary;
         uint256 _reward;
         bool transferStatus;
     }
 
     mapping(address=>uint256)_deposit;
-    mapping(address => beneficiaryMain)listOfBeneficiaries;
 
-    beneficiaryMain [] beneficiary;
+    beneficiary [] beneficiaryList;
 
     address contractOwner;
     IERC20 private token;
@@ -35,20 +34,21 @@ contract DistributionContract {
         token.transferFrom(contractOwner, address(this), _amount);
     }
 
-    function addBeneficiaries (address _beneficiaries , uint256 _amount) public onlyOwner {
+    function addBeneficiaries (uint256 _beneficiaries , uint256 _amount) public onlyOwner {
 
-        listOfBeneficiaries[_beneficiaries]._addressOfBeneficiary = _beneficiaries;
-        listOfBeneficiaries[_beneficiaries]._reward = _amount;
+        for(uint256 a = 0 ; a <= _beneficiaries ; a++){
+             beneficiaryList[a]._reward = _amount;
+             beneficiaryList[a].transferStatus = false;
+        }
     }
 
     function addBeneficiary (address _beneficiary , uint256 _amount) public onlyOwner {
 
-        listOfBeneficiaries[_beneficiary]._addressOfBeneficiary = _beneficiary;
-        listOfBeneficiaries[_beneficiary]._reward = _amount;
+        beneficiaryList.push(beneficiary(_beneficiary,_amount,false));
     }
 
-    function decreaseReward (address _beneficiary , uint256 _amount) public onlyOwner {
-        listOfBeneficiaries[_beneficiary]._reward = _amount;
+    function decreaseReward (uint _beneficiary , uint256 _amount) public onlyOwner {
+        beneficiaryList[_beneficiary]._reward = _amount;
     }
 
     function emergencyWithdraw (uint256 _amount) public onlyOwner {
@@ -56,18 +56,18 @@ contract DistributionContract {
     }
 
     function lockRewards (uint256 beneficiaryIndex) public onlyOwner {
-        if(beneficiary[beneficiaryIndex].transferStatus == false) {
-            beneficiary[beneficiaryIndex].transferStatus = true;
+        if(beneficiaryList[beneficiaryIndex].transferStatus == false) {
+            beneficiaryList[beneficiaryIndex].transferStatus = true;
         }
-        else if(beneficiary[beneficiaryIndex].transferStatus == true) {
-            beneficiary[beneficiaryIndex].transferStatus = false;
+        else if(beneficiaryList[beneficiaryIndex].transferStatus == true) {
+            beneficiaryList[beneficiaryIndex].transferStatus = false;
         }
     }
 
     function claim () public {
         token.transferFrom(address(this),
-        listOfBeneficiaries[msg.sender]._addressOfBeneficiary,
-        listOfBeneficiaries[msg.sender]._reward);
+        beneficiaryList[msg.sender]._addressOfBeneficiary,
+        beneficiaryList[msg.sender]._reward);
     }
 
 
