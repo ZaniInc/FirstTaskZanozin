@@ -6,12 +6,12 @@ import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DistributionContract {
 
-    mapping(address=>uint256)_balanceOfBeneficiares;
+    mapping(address=>uint256) public _balanceOfBeneficiares;
 
-    address [] beneficiaryList;
-    uint [] amountTokensForBencefiares;
+    address [] private beneficiaryList;
+    uint [] private amountTokensForBencefiares;
 
-    address contractOwner;
+    address private contractOwner;
     bool public lockStatus;
     IERC20 private token;
 
@@ -21,7 +21,7 @@ contract DistributionContract {
     }
 
     modifier onlyOwner () {
-        require(contractOwner==msg.sender);
+        require(contractOwner==msg.sender , "Set contract owner");
         _;
     }
 
@@ -40,14 +40,14 @@ contract DistributionContract {
     }
 
     function addBeneficiary (address _beneficiary , uint256 _amount) public onlyOwner {
-        require(_amount != 0 && _beneficiary != address(0));
+        require(_amount != 0 && _beneficiary != address(0) , "Exceed 0");
         beneficiaryList.push(_beneficiary);
         amountTokensForBencefiares.push(_amount);
          _balanceOfBeneficiares[_beneficiary] = _amount;
     }
 
     function decreaseReward (uint _beneficiary , uint256 _amount) public onlyOwner {
-        require(_amount != 0 && _beneficiary != 0);
+        require(_amount != 0 && _beneficiary != 0 , "Exceed 0");
         amountTokensForBencefiares[_beneficiary] -= _amount;
     }
 
