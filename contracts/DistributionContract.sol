@@ -8,8 +8,8 @@ contract DistributionContract {
 
     mapping(address=>uint256) public _balanceOfBeneficiares;
 
-    address [] private beneficiaryList;
-    uint [] private amountTokensForBencefiares;
+    address [] public beneficiaryList;
+    uint [] public amountTokensForBencefiares;
 
     address private contractOwner;
     bool public lockStatus;

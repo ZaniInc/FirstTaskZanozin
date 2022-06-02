@@ -31,20 +31,20 @@ contract("Distribution contract", accounts => {
         let amounts = [new BN(1),new BN(11)];
         let addBeneficiariesFunc = await instanceDistribution.addBeneficiaries(beneficiaries,amounts);
         expect(await instanceDistribution.showArray()).to.have.lengthOf(2);
-        expect(await instanceDistribution.showArrayB()).to.have.lengthOf(2);;
+        expect(await instanceDistribution.showArrayB()).to.have.lengthOf(2);
     });
 
     it("Add beneficiary", async () => {
         let instanceDistribution = await DistributionContract.deployed();
         let addBeneficiaryFunc = await instanceDistribution.addBeneficiary(acc4,new BN(3));
-        console.log(await instanceDistribution.showArray());
-        console.log(await instanceDistribution.showArrayB());
+        expect(await instanceDistribution.beneficiaryList(2)).to.be.eq(acc4);
+        expect(await instanceDistribution.amountTokensForBencefiares([2])).to.be.a.bignumber.eq(new BN(3));
     });
 
     it("Decrease reward", async () => {
         let instanceDistribution = await DistributionContract.deployed();
         let decreaseReward = await instanceDistribution.decreaseReward(1,new BN(3));
-        console.log(await instanceDistribution.showArrayB());
+        expect(await instanceDistribution.amountTokensForBencefiares([1])).to.be.a.bignumber.eq(new BN(8));
     });
 
     it("Emergency withdraw" , async () => {
