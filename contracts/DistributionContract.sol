@@ -70,7 +70,7 @@ contract DistributionContract {
     function showArray () public view returns (address [] memory) {
         return beneficiaryList;
     }
-
+//
      function showArrayB () public view returns (uint [] memory) {
         return amountTokensForBencefiares;
     }
