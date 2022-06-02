@@ -58,7 +58,7 @@ contract("Distribution contract", accounts => {
         let instanceDistribution = await DistributionContract.deployed();
         let lockRewards = await instanceDistribution.lockRewards(false);
         expect(await instanceDistribution.lockStatus()).to.be.eq(false);
-        expect(await instanceDistribution.claim({from: acc2})).to.be.revertedWith("claim is locked !");
+        await expect(instanceDistribution.claim({from: acc2})).to.be.rejectedWith("claim is locked !");
     });
 
     it("Lock/unlock + claim - success" , async () => {
