@@ -26,13 +26,12 @@ contract("Distribution contract", accounts => {
     });
 
     it("Add beneficiaries", async () => {
-        let instanceToken = await MyTokenn.deployed();
         let instanceDistribution = await DistributionContract.deployed();
         let beneficiaries = [acc2,acc3];
         let amounts = [new BN(1),new BN(11)];
         let addBeneficiariesFunc = await instanceDistribution.addBeneficiaries(beneficiaries,amounts);
-        console.log(await instanceDistribution.showArray());
-        console.log(await instanceDistribution.showArrayB());
+        expect(await instanceDistribution.showArray()).to.have.lengthOf(2);
+        expect(await instanceDistribution.showArrayB()).to.have.lengthOf(2);;
     });
 
     it("Add beneficiary", async () => {
@@ -57,7 +56,6 @@ contract("Distribution contract", accounts => {
 
     it("Lock/unlock + claim - must reverted" , async () => {
         let instanceDistribution = await DistributionContract.deployed();
-        let instanceToken = await MyTokenn.deployed();
         let lockRewards = await instanceDistribution.lockRewards(false);
         expect(await instanceDistribution.lockStatus()).to.be.eq(false);
         expect(await instanceDistribution.claim({from: acc2})).to.be.revertedWith("claim is locked !");

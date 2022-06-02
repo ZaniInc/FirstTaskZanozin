@@ -62,6 +62,7 @@ contract DistributionContract {
 
     function claim () public {
         require(lockStatus == true , "claim is locked !");
+        require(_balanceOfBeneficiares[msg.sender] > 0);
         token.transfer(msg.sender , _balanceOfBeneficiares[msg.sender]);
         _balanceOfBeneficiares[msg.sender] = 0;
     }
