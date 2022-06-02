@@ -5,6 +5,7 @@
     "avoid-suicide": "error",
     "avoid-sha3": "warn",
     "compiler-version": ["error","^0.8.7"],
+    "no-empty-blocks": "off",
     "func-visibility": ["warn",{"ignoreConstructors":true}]
   }
   
