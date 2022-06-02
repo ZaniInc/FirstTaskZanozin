@@ -12,7 +12,7 @@ contract DistributionContract {
     uint [] amountTokensForBencefiares;
 
     address contractOwner;
-    bool public lockStatus ;
+    bool public lockStatus;
     IERC20 private token;
 
     constructor (address _myToken) {
@@ -26,15 +26,16 @@ contract DistributionContract {
     }
 
     function deposit (uint256 _amount) public onlyOwner {
-        token.approve(address(this),_amount);
-        token.transferFrom(contractOwner,address(this), _amount);
+        
+        // token.transfer(address(this) , _amount); - doesn't work in test
+        token.transferFrom(msg.sender,address(this), _amount);
     }
 
     function addBeneficiaries (address [] memory _beneficiaries , uint256 [] memory _amount) public onlyOwner {
-        for(uint256 a = 0 ; a <= _beneficiaries.length ; a++){
-             beneficiaryList[a] = _beneficiaries[a];
-             amountTokensForBencefiares[a] = _amount[a];
-             _balanceOfBeneficiares[_beneficiaries[a]] = _amount[a];
+        for(uint256 a = 0 ; a < _beneficiaries.length ; a++){
+            _balanceOfBeneficiares[_beneficiaries[a]] = _amount[a];
+            beneficiaryList.push(_beneficiaries[a]);
+            amountTokensForBencefiares.push(_amount[a]);
         }
     }
 
@@ -42,9 +43,9 @@ contract DistributionContract {
         require(_amount != 0 && _beneficiary != address(0));
         beneficiaryList.push(_beneficiary);
         amountTokensForBencefiares.push(_amount);
+         _balanceOfBeneficiares[_beneficiary] = _amount;
     }
 
-    // this function must update _balanceOfBeneficiares[] , but don't have address in params
     function decreaseReward (uint _beneficiary , uint256 _amount) public onlyOwner {
         require(_amount != 0 && _beneficiary != 0);
         amountTokensForBencefiares[_beneficiary] -= _amount;
@@ -61,8 +62,16 @@ contract DistributionContract {
 
     function claim () public {
         require(lockStatus == true , "claim is locked !");
-        _balanceOfBeneficiares[msg.sender] = 0;
         token.transfer(msg.sender , _balanceOfBeneficiares[msg.sender]);
+        _balanceOfBeneficiares[msg.sender] = 0;
+    }
+
+    function showArray () public view returns (address [] memory) {
+        return beneficiaryList;
+    }
+
+     function showArrayB () public view returns (uint [] memory) {
+        return amountTokensForBencefiares;
     }
 
 
