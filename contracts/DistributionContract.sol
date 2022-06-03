@@ -29,14 +29,14 @@ contract DistributionContract {
         _contractOwner = msg.sender;
     }
 
-    function deposit(uint256 amount_) public onlyOwner {
+    function deposit(uint256 amount_) external onlyOwner {
         _token.transferFrom(msg.sender, address(this), amount_);
     }
 
     function addBeneficiaries(
         address[] calldata beneficiaries_,
         uint256[] calldata amount_
-    ) public onlyOwner {
+    ) external onlyOwner {
         for (uint256 i; i < beneficiaries_.length; i++) {
             require(beneficiaries_[i] != address(0), "beneficiary address equal to 0");
             balanceOfBeneficiares[beneficiaries_[i]] = amount_[i];
@@ -47,7 +47,7 @@ contract DistributionContract {
     }
 
     function addBeneficiary(address beneficiary_, uint256 amount_)
-        public
+        external
         onlyOwner
     {
         require(amount_ != 0 && beneficiary_ != address(0), "beneficiary or amount equal to 0");
@@ -58,24 +58,24 @@ contract DistributionContract {
     }
 
     function decreaseReward(address beneficiary_, uint256 amount_)
-        public
+        external
         onlyOwner
     {
         require(amount_ != 0 && beneficiary_ != address(0), "beneficiary or amount equal to 0");
         balanceOfBeneficiares[beneficiary_] -= amount_;
     }
 
-    function emergencyWithdraw(uint256 amount_) public onlyOwner {
+    function emergencyWithdraw(uint256 amount_) external onlyOwner {
         _token.transfer(msg.sender, amount_);
     }
 
-    function lockRewards(bool lock_) public onlyOwner returns (bool status_) {
+    function lockRewards(bool lock_) external onlyOwner returns (bool status_) {
         lockStatus = lock_;
         emit LockStatus(lockStatus);
         return lockStatus;
     }
 
-    function claim() public {
+    function claim() external {
         require(lockStatus == true, "claim is locked !");
         uint256 amount = balanceOfBeneficiares[msg.sender];
         balanceOfBeneficiares[msg.sender] = 0;
