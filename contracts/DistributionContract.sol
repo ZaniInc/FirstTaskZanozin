@@ -38,6 +38,7 @@ contract DistributionContract {
         uint256[] calldata amount_
     ) public onlyOwner {
         for (uint256 i; i < beneficiaries_.length; i++) {
+            require(beneficiaries_[i] != address(0), "beneficiary address equal to 0");
             balanceOfBeneficiares[beneficiaries_[i]] = amount_[i];
             beneficiaryList.push(beneficiaries_[i]);
             amountTokensForBencefiares.push(amount_[i]);
