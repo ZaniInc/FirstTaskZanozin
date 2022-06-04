@@ -45,8 +45,9 @@ contract("Distribution contract", async ([owner,acc2,acc3,acc4]) => {
             let beneficiaries = [acc2,acc3];
             let amounts = [web3.utils.toWei("10","ether"),web3.utils.toWei("110","ether")];
             await instanceDistribution.addBeneficiaries(beneficiaries,amounts);
-            await expect(web3.utils.toBN(instanceDistribution.beneficiaryList.length)).to.be.bignumber.equal(new BN(2));
-            await expect(web3.utils.toBN(instanceDistribution.amountTokensForBencefiares.length)).to.be.bignumber.equal(new BN(2));
+            let a = await instanceDistribution.beneficiaryList.call(0);
+            await expect(a).to.have.members(beneficiaries);
+            // await expect(web3.utils.toBN(instanceDistribution.amountTokensForBencefiares.length(2))).to.be.bignumber.equal(new BN(2));
         });
 
     });
