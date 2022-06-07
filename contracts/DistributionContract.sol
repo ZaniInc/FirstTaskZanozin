@@ -49,7 +49,7 @@ contract DistributionContract {
 
     /**
      * @dev Set _token IERC20 to interact with thrid party token
-     * 
+     *
      * Put address to state variable '_contractOwner'
      *
      * @param address of ERC20 contract
