@@ -1,26 +1,27 @@
 // SPDX-License-Identifier: MIT
 
-pragma solidity ^0.8.7;
+pragma solidity 0.8.7;
 
 import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
 
 contract DistributionContract {
-    IERC20 private _token;
-
     mapping(address => uint256) public balanceOfBeneficiares;
 
-    address[] public beneficiaryList;
-    uint256[] public amountTokensForBencefiares;
-
-    address private _contractOwner;
     bool public lockStatus;
 
-    event RewardCollect(address beneficiaries_, uint256 amount_, bool transferStatus_);
+    address private _contractOwner;
+    IERC20 private _token;
+
+    event RewardCollect(
+        address beneficiaries_,
+        uint256 amount_,
+        bool transferStatus_
+    );
     event ClaimInfo(address beneficiaries_, uint256 amount_);
     event LockStatus(bool lock);
 
     modifier onlyOwner() {
-        require(_contractOwner==msg.sender , "caller is not the owner");
+        require(_contractOwner == msg.sender, "caller is not the owner");
         _;
     }
 
@@ -38,11 +39,16 @@ contract DistributionContract {
         uint256[] calldata amount_
     ) external onlyOwner {
         for (uint256 i; i < beneficiaries_.length; i++) {
-            require(beneficiaries_[i] != address(0), "beneficiary address equal to 0");
-            balanceOfBeneficiares[beneficiaries_[i]] = amount_[i];
-            beneficiaryList.push(beneficiaries_[i]);
-            amountTokensForBencefiares.push(amount_[i]);
-            emit RewardCollect(beneficiaries_[i],amount_[i],true);
+            require(
+                beneficiaries_[i] != address(0) && amount_[i] != 0,
+                "beneficiary or amount equal to 0"
+            );
+            require(
+                beneficiaries_.length == amount_.length,
+                "arrays have different length"
+            );
+            balanceOfBeneficiares[beneficiaries_[i]] += amount_[i];
+            emit RewardCollect(beneficiaries_[i], amount_[i], true);
         }
     }
 
@@ -50,18 +56,22 @@ contract DistributionContract {
         external
         onlyOwner
     {
-        require(amount_ != 0 && beneficiary_ != address(0), "beneficiary or amount equal to 0");
-        beneficiaryList.push(beneficiary_);
-        amountTokensForBencefiares.push(amount_);
-        balanceOfBeneficiares[beneficiary_] = amount_;
-        emit RewardCollect(beneficiary_,amount_,true);
+        require(
+            amount_ != 0 && beneficiary_ != address(0),
+            "beneficiary or amount equal to 0"
+        );
+        balanceOfBeneficiares[beneficiary_] += amount_;
+        emit RewardCollect(beneficiary_, amount_, true);
     }
 
     function decreaseReward(address beneficiary_, uint256 amount_)
         external
         onlyOwner
     {
-        require(amount_ != 0 && beneficiary_ != address(0), "beneficiary or amount equal to 0");
+        require(
+            amount_ != 0 && beneficiary_ != address(0),
+            "beneficiary or amount equal to 0"
+        );
         balanceOfBeneficiares[beneficiary_] -= amount_;
     }
 
@@ -69,14 +79,14 @@ contract DistributionContract {
         _token.transfer(msg.sender, amount_);
     }
 
-    function lockRewards(bool lock_) external onlyOwner returns (bool status_) {
+    function lockRewards(bool lock_) external onlyOwner {
         lockStatus = lock_;
         emit LockStatus(lockStatus);
-        return lockStatus;
     }
 
     function claim() external {
-        require(lockStatus == true, "claim is locked !");
+        require(lockStatus, "claim is locked !");
+        require(balanceOfBeneficiares[msg.sender] > 0, "balance must be > 0");
         uint256 amount = balanceOfBeneficiares[msg.sender];
         balanceOfBeneficiares[msg.sender] = 0;
         _token.transfer(msg.sender, amount);
