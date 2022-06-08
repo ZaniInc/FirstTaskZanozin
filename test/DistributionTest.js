@@ -70,10 +70,10 @@ contract("DistributionContract", async ([owner, acc2, acc3, acc4]) => {
                 let beneficiaries_ = [acc2, acc3];
                 let amounts_ = [ether('10'), ether('110')];
                 let tx = await instanceDistribution.addBeneficiaries(beneficiaries_, amounts_);
-                expectEvent(tx, "RewardCollectBeneficiaries", { beneficiaries: beneficiaries_, amount: [ether('10'), ether('110')] });
+                // expectEvent(tx, "RewardCollectBeneficiaries", { beneficiaries: beneficiaries_, amount: [ether('10'), ether('110')] });
                 await expect(beneficiaries_.length).to.be.equal(amounts_.length);
-                expect(await instanceDistribution.balanceOfBeneficiares(acc2)).to.be.equal(ether('10'));
-                expect(await instanceDistribution.balanceOfBeneficiares(acc3)).to.be.equal(ether('110'));
+                expect(await instanceDistribution.balanceOfBeneficiares(acc2)).to.be.bignumber.equal(ether('10'));
+                expect(await instanceDistribution.balanceOfBeneficiares(acc3)).to.be.bignumber.equal(ether('110'));
             });
 
         });
@@ -129,13 +129,14 @@ contract("DistributionContract", async ([owner, acc2, acc3, acc4]) => {
             });
 
             it("Decrease reward - must reverted , balance lower than amount ", async () => {
-                await expectRevert(instanceDistribution.decreaseReward(acc3, ether('300')),"balance lower then amount_");
+                await expectRevert(instanceDistribution.decreaseReward(acc3, ether('300')), "balance lower then amount_");
             });
 
         });
 
         describe("Decrease reward function - success group", async () => {
             it("Decrease reward - must success", async () => {
+                expect(await instanceDistribution.balanceOfBeneficiares(acc3)).to.be.bignumber.equal(ether('110'));
                 let tx = await instanceDistribution.decreaseReward(acc3, ether('30'));
                 expect(await instanceDistribution.balanceOfBeneficiares(acc3)).to.be.bignumber.equal(ether('80'));
                 await expectEvent(tx, "DecreaseReward", { beneficiary: acc3, amount: ether('30') });
@@ -157,41 +158,40 @@ contract("DistributionContract", async ([owner, acc2, acc3, acc4]) => {
         });
 
     });
-    
+
     describe("claim", async () => {
 
-        describe("claim - fail group", async () => {
+        describe("claim/lockRewards - fail group", async () => {
 
             it("Lock/unlock + claim - must reverted , claim is locked ", async () => {
                 await instanceDistribution.lockRewards(false);
                 expect(await instanceDistribution.lockStatus()).to.be.equal(false);
                 await expectRevert(instanceDistribution.claim({ from: acc2 }), 'claim is locked');
             });
-    
+
             it("Lock/unlock + claim - balance 0", async () => {
                 await instanceDistribution.lockRewards(true);
                 expect(await instanceDistribution.lockStatus()).to.be.equal(true);
                 await expectRevert(instanceDistribution.claim({ from: owner }), "balance must be > 0");
             });
 
+            it("lockRewards function - fail , caller is not the owner", async () => {
+                await expectRevert(instanceDistribution.lockRewards(true, { from: acc2 }), "caller is not the owner");
+                expect(await instanceDistribution.lockStatus()).to.be.equal(true);
+            });
+
         });
-        describe("Decrease reward function - success group", async () => {
+        describe("claim - success group", async () => {
             it("Lock/unlock + claim - success", async () => {
                 let lock = await instanceDistribution.lockRewards(true);
                 expectEvent(lock, "LockStatus", { lock: true });
                 expect(await instanceDistribution.lockStatus()).to.be.equal(true);
-                expect(await instanceDistribution.balanceOfBeneficiares(acc2)).to.be.equal(ether('10'));
+                expect(await instanceDistribution.balanceOfBeneficiares(acc2)).to.be.bignumber.equal(ether('10'));
                 let claim = await instanceDistribution.claim({ from: acc2 });
                 expectEvent(claim, "ClaimInfo", { beneficiaries: acc2, amount: ether('10') });
                 expect(await instanceToken.balanceOf(acc2)).to.be.bignumber.equal(ether('10'));
-                expect(await instanceDistribution.balanceOfBeneficiares(acc2)).to.be.equal(ether('0'));
+                expect(await instanceDistribution.balanceOfBeneficiares(acc2)).to.be.bignumber.equal(ether('0'));
             });
-            // let lock = await instanceDistribution.lockRewards(true);
-            // expectEvent(lock, "LockStatus", { lock: true });
-            // expect(await instanceDistribution.lockStatus()).to.be.eq(true);
-            // let claim = await instanceDistribution.claim({ from: acc2 });
-            // expectEvent(claim, "ClaimInfo", { beneficiaries_: acc2, amount_: ether('10') });
-            // expect(await instanceToken.balanceOf(acc2)).to.be.bignumber.equal(ether('10'));
         });
     });
 });    
