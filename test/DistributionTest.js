@@ -70,7 +70,7 @@ contract("DistributionContract", async ([owner, acc2, acc3, acc4]) => {
                 let beneficiaries_ = [acc2, acc3];
                 let amounts_ = [ether('10'), ether('110')];
                 let tx = await instanceDistribution.addBeneficiaries(beneficiaries_, amounts_);
-                expectEvent(tx, "RewardCollectBeneficiaries", { beneficiaries: beneficiaries_, amount: amounts_ });
+                expectEvent(tx, "RewardCollectBeneficiaries", { beneficiaries: beneficiaries_, amount: [ether('10'), ether('110')] });
                 await expect(beneficiaries_.length).to.be.equal(amounts_.length);
                 expect(await instanceDistribution.balanceOfBeneficiares(acc2)).to.be.equal(ether('10'));
                 expect(await instanceDistribution.balanceOfBeneficiares(acc3)).to.be.equal(ether('110'));
