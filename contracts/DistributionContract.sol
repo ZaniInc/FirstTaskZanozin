@@ -52,7 +52,7 @@ contract DistributionContract {
      *
      * Put address to state variable '_contractOwner'
      *
-     * @param address of ERC20 contract
+     * @param myToken_ of ERC20 contract
      */
     constructor(address myToken_) {
         _token = IERC20(myToken_);

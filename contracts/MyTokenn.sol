@@ -8,8 +8,10 @@ contract MyTokenn is ERC20 {
     /**
      * @dev Sets the values for ERC20 constructor and call mint.
      *
-     * @param name - contains token name
-     * @param symbol - contains symbol of token
+     * Take two parameters:
+     *
+     * name_ - contains token name
+     * symbol_ - contains symbol of token
      *
      * NOTE : call low-level function _mint to mint ERC20 tokens at owner
      * account
