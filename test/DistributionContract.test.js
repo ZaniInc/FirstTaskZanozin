@@ -159,7 +159,7 @@ contract("DistributionContract", async ([owner, acc2, acc3, acc4]) => {
 
     });
 
-    describe("claim", async () => {
+    describe("claim + lockRewards", async () => {
 
         describe("claim/lockRewards - fail group", async () => {
 
