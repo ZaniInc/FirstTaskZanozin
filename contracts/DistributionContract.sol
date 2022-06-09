@@ -236,8 +236,8 @@ contract DistributionContract {
      */
     function claim() external {
         require(lockStatus, "claim is locked !");
-        require(balanceOfBeneficiares[msg.sender] > 0, "balance must be > 0");
         uint256 amount = balanceOfBeneficiares[msg.sender];
+        require(amount > 0, "balance must be > 0");
         balanceOfBeneficiares[msg.sender] = 0;
         _token.safeTransfer(msg.sender, amount);
         emit ClaimInfo(msg.sender, amount);
